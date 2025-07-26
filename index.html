@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,26 +14,36 @@
       margin: 0;
       padding: 0;
     }
-    .container {
-      max-width: 800px;
-      margin: 40px auto;
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .section {
       background-color: #2a2a2a;
-      padding: 30px;
+      padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      box-sizing: border-box;
     }
-    h1 {
-      text-align: center;
+
+    h2 {
       color: orange;
-      margin-bottom: 30px;
+      margin-top: 0;
     }
+
     label {
       font-weight: bold;
       display: block;
       margin-top: 15px;
       margin-bottom: 5px;
     }
-    select, input[type="text"], button {
+
+    select, input[type="text"], input[type="date"], textarea, button {
       width: 100%;
       padding: 10px;
       font-size: 16px;
@@ -41,91 +52,167 @@
       border: none;
       background-color: #444;
       color: white;
+      box-sizing: border-box;
     }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+
     button {
       background-color: #555;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     button:hover {
       background-color: #666;
     }
+
     .toggle-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
     }
+
     .toggle-buttons button {
       flex: 1;
       padding: 12px;
       font-weight: bold;
       border-radius: 6px;
     }
+
     .toggle-buttons .active {
       color: white;
     }
+
     #acceptBtn.active {
       background-color: green;
     }
+
     #denyBtn.active {
       background-color: red;
     }
+
+    .textarea-container {
+      position: relative;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
     textarea {
-      width: 100%;
-      height: 500px;
       background-color: #1e1e1e;
       color: white;
       padding: 15px;
       font-size: 15px;
       border-radius: 8px;
       border: 1px solid #444;
-      resize: vertical;
-      margin-top: 20px;
       box-sizing: border-box;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
-    .copy-button {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      position: absolute;
-      right: 10px;
-      top: 10px;
-    }
-    .copied-icon {
+
+    textarea::-webkit-scrollbar {
       display: none;
-      height: 40px;
     }
+
+    #output {
+      height: 400px;
+    }
+
+    #logOutput {
+      height: 200px;
+    }
+
+    .copied-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: auto;
+      width: 100%;
+      max-width: 200px;
+      display: none;
+      pointer-events: none;
+      z-index: 10;
+    }
+
     .copied-icon.show {
-      display: inline;
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Civ+ Acceptance Generator</h1>
+  <div class="main-grid">
+    <div class="section">
+      <h2>CIV+ Acceptance Generator</h2>
+      <div class="toggle-buttons">
+        <button id="acceptBtn" class="active" onclick="setMode('accept')">Accept</button>
+        <button id="denyBtn" onclick="setMode('deny')">Deny</button>
+      </div>
 
-    <div class="toggle-buttons">
-      <button id="acceptBtn" class="active" onclick="setMode('accept')">Accept</button>
-      <button id="denyBtn" onclick="setMode('deny')">Deny</button>
+      <label for="discordId">Discord ID (for @mention):</label>
+      <input type="text" id="discordId" placeholder="123456789012345678" />
+
+      <label for="nameSelect">Staff Name:</label>
+      <select id="nameSelect"></select>
+
+      <label for="roleSelect">Staff Role:</label>
+      <select id="roleSelect"></select>
+
+      <button onclick="generate()">Generate Message</button>
+
+      <div class="textarea-container">
+        <textarea id="output" readonly onclick="copyToClipboard()" placeholder="Generated acceptance or denial message will appear here..."></textarea>
+        <img src="copied-stamp.png" alt="Copied!" class="copied-icon" id="copiedIcon" />
+      </div>
     </div>
 
-    <label for="discordId">Discord ID (for @mention):</label>
-    <input type="text" id="discordId" placeholder="123456789012345678" />
+    <div class="section">
+      <h2>CIV+ Apps Logging</h2>
 
-    <label for="nameSelect">Staff Name:</label>
-    <select id="nameSelect"></select>
+      <label for="ingameName">Ingame Name:</label>
+      <input type="text" id="ingameName" placeholder="Player's Name" />
 
-    <label for="roleSelect">Staff Role:</label>
-    <select id="roleSelect"></select>
+      <label for="discordTag">Discord Mention:</label>
+      <input type="text" id="discordTag" readonly />
 
-    <button onclick="generate()">Generate Message</button>
+      <label for="appDate">Date of Application:</label>
+      <input type="date" id="appDate" />
 
-    <div style="position: relative; width: 100%;">
-      <textarea id="output" readonly></textarea>
-      <button class="copy-button" onclick="copyToClipboard()" title="Copy to clipboard">
-        <img src="copied-stamp.png" alt="Copied!" class="copied-icon" id="copiedIcon" />
-      </button>
+      <label for="ticketId">Ticket ID:</label>
+      <input type="text" id="ticketId" placeholder="e.g. 22489" />
+
+      <label for="outcome">Outcome:</label>
+      <input type="text" id="outcome" readonly />
+
+      <label for="staffMember">Staff Member:</label>
+      <input type="text" id="staffMember" readonly />
+
+      <label for="notes">Notes:</label>
+      <textarea id="notes" rows="2" placeholder="Optional notes..."></textarea>
+
+      <label for="loggedTx">Logged in TX if successful:</label>
+      <select id="loggedTx">
+        <option value="">Select...</option>
+        <option value="Yes">Yes</option>
+        <option value="N/A">N/A</option>
+      </select>
+
+      <div class="textarea-container">
+        
+<button onclick="generate()">Generate Log Entry</button>
+<textarea id="logOutput" readonly onclick="copyLogToClipboard()" placeholder="Generated log entry will appear here..."></textarea>
+        <img src="copied-stamp.png" alt="Copied!" class="copied-icon" id="copiedIconLog" />
+      </div>
     </div>
   </div>
 
@@ -134,6 +221,11 @@
 
     const nameSelect = document.getElementById('nameSelect');
     const roleSelect = document.getElementById('roleSelect');
+    const discordTag = document.getElementById('discordTag');
+    const appDate = document.getElementById('appDate');
+    const outcomeField = document.getElementById('outcome');
+    const staffMemberField = document.getElementById('staffMember');
+    const logOutput = document.getElementById('logOutput');
 
     fetch('staff.json')
       .then(response => response.json())
@@ -172,17 +264,41 @@
       }
     }
 
+    function formatDateOrdinal(dateStr) {
+      const date = new Date(dateStr);
+      const day = date.getDate();
+      const suffix = getOrdinalSuffix(day);
+      const month = date.toLocaleString('en-NZ', { month: 'long' });
+      const year = date.getFullYear();
+      return `${day}${suffix} ${month} ${year}`;
+    }
+
     function generate() {
       const discordId = document.getElementById('discordId').value.trim();
       const name = nameSelect.value;
       const role = roleSelect.value;
+      const ingameName = document.getElementById('ingameName').value.trim();
+      const ticketId = document.getElementById('ticketId').value.trim();
+      const notesField = document.getElementById('notes');
+      const loggedTx = document.getElementById('loggedTx').value;
 
-      let message = "";
+      const today = new Date();
+      let futureDate = new Date(today);
+      futureDate.setMonth(futureDate.getMonth() + 1);
+      const formattedDate = formatDateOrdinal(futureDate.toISOString());
 
-      if (mode === "accept") {
-        message = `Kia Ora, <@${discordId}>
+      discordTag.value = `<@${discordId}>`;
+      outcomeField.value = mode === 'accept' ? 'Accepted' : 'Denied';
+      staffMemberField.value = `${name} (${role})`;
 
-You have been accepted as a CIV+, 
+      if (mode === 'deny') {
+        notesField.value = `Player eligible to re-apply for CIV+ from ${formattedDate}`;
+      }
+
+      const message = mode === "accept" ? 
+`Kia Ora, <@${discordId}>
+
+You have been accepted as a CIV+,
 Your role as a civilian remains the same, as of now, you have access to more items which you can utilize in your RP, these include things such as the 'super' category in vMenu, firearms, planes, music commands, and creating crowds
 Just because you have access to the new weapons, it doesn't mean you need to use them! We need to increase the amount of FRNZ/Ambulance calls are getting.
 
@@ -201,37 +317,49 @@ Any questions please let me know.
 
 Cheers,  
 ${name}  
-${role}`;
-      } else {
-        const futureDate = new Date();
-        futureDate.setMonth(futureDate.getMonth() + 1);
+${role}` 
+:
+`Kia Ora, <@${discordId}>
 
-        const day = futureDate.getDate();
-        const suffix = getOrdinalSuffix(day);
-        const month = futureDate.toLocaleString('en-NZ', { month: 'long' });
-        const year = futureDate.getFullYear();
-        const formattedDate = `${day}${suffix} ${month} ${year}`;
-
-        message = `Kia Ora, <@${discordId}>
-
-Thank you for applying for CIV+. Unfortunately we do not believe you are fit for CIV+ at this stage. 
-Please do not be disheartened and please continue to show our community what you are capable of. 
+Thank you for applying for civ+ but unfortunately we do not believe you are fit for CIV+ at this stage. 
+Please do not be disheartened and continue to show staff what you are capable of. 
 
 You are eligible to re-apply for CIV+ from ${formattedDate}
 
 Kind Regards,  
 ${name}  
 ${role}`;
-      }
 
       document.getElementById('output').value = message;
+
+      const dateValue = appDate.value ? formatDateOrdinal(appDate.value) : 'Not set';
+
+      const appLog = `Ingame Name: ${ingameName}
+Discord: <@${discordId}>
+Date of Application: ${dateValue}
+TicketID: ${ticketId}
+Outcome: ${mode === 'accept' ? 'Accepted' : 'Denied'}
+Staff Member: ${name} (${role})
+Notes: ${notesField.value}
+Logged in TX if successful: ${mode === 'deny' ? 'N/A' : (loggedTx || '...')}`;
+
+      logOutput.value = appLog;
+
       document.getElementById('copiedIcon').classList.remove('show');
+      document.getElementById('copiedIconLog').classList.remove('show');
     }
 
     function copyToClipboard() {
       const output = document.getElementById('output');
       navigator.clipboard.writeText(output.value).then(() => {
         document.getElementById('copiedIcon').classList.add('show');
+      });
+    }
+
+    function copyLogToClipboard() {
+      const output = document.getElementById('logOutput');
+      navigator.clipboard.writeText(output.value).then(() => {
+        document.getElementById('copiedIconLog').classList.add('show');
       });
     }
   </script>
