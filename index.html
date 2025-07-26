@@ -12,6 +12,7 @@
       margin: 0;
       padding: 0;
     }
+
     .container {
       max-width: 800px;
       margin: 40px auto;
@@ -21,17 +22,20 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
       position: relative;
     }
+
     h1 {
       text-align: center;
       color: orange;
       margin-bottom: 30px;
     }
+
     label {
       font-weight: bold;
       display: block;
       margin-top: 15px;
       margin-bottom: 5px;
     }
+
     select, input[type="text"], button {
       width: 100%;
       padding: 10px;
@@ -42,21 +46,25 @@
       background-color: #444;
       color: white;
     }
+
     button {
       background-color: #555;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     button:hover {
       background-color: #666;
     }
+
     .output-wrapper {
       position: relative;
       margin-top: 20px;
     }
+
     textarea {
       width: 100%;
-      height: 500px;
+      min-height: 500px;
       background-color: #1e1e1e;
       color: white;
       padding: 15px;
@@ -64,9 +72,19 @@
       border-radius: 8px;
       border: 1px solid #444;
       resize: none;
-      overflow: hidden;
+      overflow-y: scroll;
       cursor: pointer;
+      box-sizing: border-box;
+
+      /* Hide scrollbar cross-browser */
+      scrollbar-width: none;          /* Firefox */
+      -ms-overflow-style: none;       /* IE 10+ */
     }
+
+    textarea::-webkit-scrollbar {
+      display: none;                  /* Chrome/Safari */
+    }
+
     #copiedIcon {
       position: absolute;
       top: 50%;
@@ -74,9 +92,8 @@
       transform: translate(-50%, -50%);
       display: none;
       pointer-events: none;
-      max-width: 100%;
-      max-height: 100%;
     }
+
     #copiedIcon.show {
       display: block;
     }
@@ -93,7 +110,7 @@
     <select id="nameSelect"></select>
 
     <label for="roleSelect">Staff Role:</label>
-    <select id="roleSelect"></select>
+    <select id="roleSelect" disabled></select>
 
     <button onclick="generate()">Generate Message</button>
 
@@ -109,20 +126,32 @@
     const output = document.getElementById('output');
     const copiedIcon = document.getElementById('copiedIcon');
 
+    let staffList = [];
+
     fetch('staff.json')
       .then(response => response.json())
       .then(data => {
+        staffList = data;
+
         data.forEach(staff => {
           const nameOption = document.createElement('option');
           nameOption.value = staff.name;
           nameOption.textContent = staff.name;
           nameSelect.appendChild(nameOption);
-
-          const roleOption = document.createElement('option');
-          roleOption.value = staff.role;
-          roleOption.textContent = staff.role;
-          roleSelect.appendChild(roleOption);
         });
+
+        nameSelect.addEventListener('change', () => {
+          const selectedStaff = staffList.find(s => s.name === nameSelect.value);
+          roleSelect.innerHTML = '';
+          if (selectedStaff) {
+            const roleOption = document.createElement('option');
+            roleOption.value = selectedStaff.role;
+            roleOption.textContent = selectedStaff.role;
+            roleSelect.appendChild(roleOption);
+          }
+        });
+
+        nameSelect.dispatchEvent(new Event('change'));
       });
 
     function generate() {
@@ -154,7 +183,7 @@ ${name}
 ${role}`;
 
       output.value = message;
-      copiedIcon.classList.remove('show'); // Reset copied icon on regeneration
+      copiedIcon.classList.remove('show');
     }
 
     function copyToClipboard() {
