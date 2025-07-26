@@ -82,23 +82,19 @@
       border: 1px solid #444;
       resize: vertical;
       margin-top: 20px;
-    }
-    .copy-container {
-      position: relative;
-      display: inline-block;
-      margin-top: 10px;
+      box-sizing: border-box;
     }
     .copy-button {
       background-color: transparent;
       border: none;
       cursor: pointer;
       position: absolute;
-      right: 0;
-      top: -40px;
+      right: 10px;
+      top: 10px;
     }
     .copied-icon {
       display: none;
-      height: 32px;
+      height: 40px;
     }
     .copied-icon.show {
       display: inline;
@@ -125,13 +121,12 @@
 
     <button onclick="generate()">Generate Message</button>
 
-    <div class="copy-container">
+    <div style="position: relative; width: 100%;">
+      <textarea id="output" readonly></textarea>
       <button class="copy-button" onclick="copyToClipboard()" title="Copy to clipboard">
         <img src="copied-stamp.png" alt="Copied!" class="copied-icon" id="copiedIcon" />
       </button>
     </div>
-
-    <textarea id="output" readonly></textarea>
   </div>
 
   <script>
@@ -219,8 +214,8 @@ ${role}`;
 
         message = `Good evening <@${discordId}>
 
-Thank you for applying for civ+ but unfortunately we do not believe you are fit for CIV+ at this stage. 
-Please do not be disheartened and continue to show staff what you are capable of. 
+Thank you for applying for CIV+, unfortunately we do not believe you are fit for CIV+ at this stage. 
+Please do not be disheartened and please continue to show our community what you are capable of. 
 
 You are eligible to re-apply for CIV+ from ${formattedDate}
 
