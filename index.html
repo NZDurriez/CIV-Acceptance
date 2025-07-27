@@ -51,10 +51,6 @@
     input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
     }
-    input[readonly] {
-      background-color: #333;
-      cursor: not-allowed;
-    }
     button {
       background-color: #555;
       cursor: pointer;
@@ -147,8 +143,7 @@
       <label for="nameSelect">Staff Member:</label>
       <select id="nameSelect"></select>
 
-      <label for="staffRole">Staff Role:</label>
-      <input type="text" id="staffRole" readonly />
+      <input type="hidden" id="staffRole" />
 
       <button onclick="generate()">Generate Message</button>
 
@@ -255,6 +250,7 @@
       const discordId = document.getElementById('discordId').value.trim();
       const name = nameSelect.value;
       const role = staffRole.value;
+
       const notesField = document.getElementById('notes');
 
       const today = new Date();
@@ -264,14 +260,13 @@
 
       discordTag.value = `<@${discordId}>`;
       outcomeField.value = mode === 'accept' ? 'Accepted' : 'Denied';
-      staffMemberField.value = name;
 
       if (mode === 'deny') {
         notesField.value = `Player eligible to re-apply for CIV+ from ${formattedDate}`;
       }
 
-      const message = mode === "accept" ?
-`Kia Ora, <@${discordId}>
+      const message = mode === "accept"
+        ? `Kia Ora, <@${discordId}>
 
 You have been accepted as a CIV+,
 Your role as a civilian remains the same, as of now, you have access to more items which you can utilize in your RP, these include things such as the 'super' category in vMenu, firearms, planes, music commands, and creating crowds
@@ -292,8 +287,8 @@ Any questions please let me know.
 
 Cheers,  
 ${name}  
-${role}` :
-`Kia Ora, <@${discordId}>
+${role}`
+        : `Kia Ora, <@${discordId}>
 
 Thank you for applying for CIV+ but unfortunately we do not believe you are fit for the CIV+ role at this stage. 
 Please do not be disheartened and continue to show staff what you are capable of. 
@@ -301,7 +296,8 @@ Please do not be disheartened and continue to show staff what you are capable of
 You are eligible to re-apply for CIV+ from ${formattedDate}
 
 Kind Regards,  
-${name}`;
+${name}  
+${role}`;
 
       document.getElementById('output').value = message;
       document.getElementById('copiedIcon').classList.remove('show');
