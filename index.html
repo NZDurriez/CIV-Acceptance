@@ -131,16 +131,16 @@
 <body>
   <div class="main-grid">
     <div class="section">
-      <h2>CIV+ Acceptance Generator</h2>
+      <h2>CIV+ Accept/Deny Generator</h2>
       <div class="toggle-buttons">
         <button id="acceptBtn" class="active" onclick="setMode('accept')">Accept</button>
         <button id="denyBtn" onclick="setMode('deny')">Deny</button>
       </div>
 
-      <label for="discordId">Discord ID (for @mention):</label>
+      <label for="discordId">Discord ID:</label>
       <input type="text" id="discordId" placeholder="123456789012345678" />
 
-      <label for="nameSelect">Staff Name:</label>
+      <label for="nameSelect">Staff Member:</label>
       <select id="nameSelect"></select>
 
       <button onclick="generate()">Generate Message</button>
@@ -157,7 +157,7 @@
       <label for="ingameName">Ingame Name:</label>
       <input type="text" id="ingameName" placeholder="Player's Name" />
 
-      <label for="discordTag">Discord Mention:</label>
+      <label for="discordTag">Discord ID:</label>
       <input type="text" id="discordTag" readonly />
 
       <label for="appDate">Date of Application:</label>
