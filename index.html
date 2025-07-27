@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +13,6 @@
       margin: 0;
       padding: 0;
     }
-
     .main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -23,26 +21,22 @@
       margin: auto;
       padding: 20px;
     }
-
     .section {
       background-color: #2a2a2a;
       padding: 20px;
       border-radius: 10px;
       box-sizing: border-box;
     }
-
     h2 {
       color: orange;
       margin-top: 0;
     }
-
     label {
       font-weight: bold;
       display: block;
       margin-top: 15px;
       margin-bottom: 5px;
     }
-
     select, input[type="text"], input[type="date"], textarea, button {
       width: 100%;
       padding: 10px;
@@ -54,53 +48,43 @@
       color: white;
       box-sizing: border-box;
     }
-
     input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
     }
-
     button {
       background-color: #555;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #666;
     }
-
     .toggle-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
     }
-
     .toggle-buttons button {
       flex: 1;
       padding: 12px;
       font-weight: bold;
       border-radius: 6px;
     }
-
     .toggle-buttons .active {
       color: white;
     }
-
     #acceptBtn.active {
       background-color: green;
     }
-
     #denyBtn.active {
       background-color: red;
     }
-
     .textarea-container {
       position: relative;
       margin-top: 10px;
       overflow: hidden;
     }
-
     textarea {
       background-color: #1e1e1e;
       color: white;
@@ -113,19 +97,15 @@
       overflow-y: auto;
       scrollbar-width: none;
     }
-
     textarea::-webkit-scrollbar {
       display: none;
     }
-
     #output {
       height: 400px;
     }
-
     #logOutput {
       height: 200px;
     }
-
     .copied-icon {
       position: absolute;
       top: 50%;
@@ -138,11 +118,9 @@
       pointer-events: none;
       z-index: 10;
     }
-
     .copied-icon.show {
       display: block;
     }
-
     @media (max-width: 900px) {
       .main-grid {
         grid-template-columns: 1fr;
@@ -164,9 +142,6 @@
 
       <label for="nameSelect">Staff Name:</label>
       <select id="nameSelect"></select>
-
-      <label for="roleSelect">Staff Role:</label>
-      <select id="roleSelect"></select>
 
       <button onclick="generate()">Generate Message</button>
 
@@ -208,9 +183,8 @@
       </select>
 
       <div class="textarea-container">
-        
-<button onclick="generate()">Generate Log Entry</button>
-<textarea id="logOutput" readonly onclick="copyLogToClipboard()" placeholder="Generated log entry will appear here..."></textarea>
+        <button onclick="generateLogEntry()">Generate Log Entry</button>
+        <textarea id="logOutput" readonly onclick="copyLogToClipboard()" placeholder="Generated log entry will appear here..."></textarea>
         <img src="copied-stamp.png" alt="Copied!" class="copied-icon" id="copiedIconLog" />
       </div>
     </div>
@@ -218,9 +192,7 @@
 
   <script>
     let mode = "accept";
-
     const nameSelect = document.getElementById('nameSelect');
-    const roleSelect = document.getElementById('roleSelect');
     const discordTag = document.getElementById('discordTag');
     const appDate = document.getElementById('appDate');
     const outcomeField = document.getElementById('outcome');
@@ -235,16 +207,11 @@
           nameOption.value = staff.name;
           nameOption.textContent = staff.name;
           nameSelect.appendChild(nameOption);
-
-          const roleOption = document.createElement('option');
-          roleOption.value = staff.role;
-          roleOption.textContent = staff.role;
-          roleSelect.appendChild(roleOption);
         });
 
         nameSelect.addEventListener('change', () => {
           const selected = data.find(staff => staff.name === nameSelect.value);
-          if (selected) roleSelect.value = selected.role;
+          if (selected) staffMemberField.value = selected.name;
         });
       });
 
@@ -276,7 +243,6 @@
     function generate() {
       const discordId = document.getElementById('discordId').value.trim();
       const name = nameSelect.value;
-      const role = roleSelect.value;
       const ingameName = document.getElementById('ingameName').value.trim();
       const ticketId = document.getElementById('ticketId').value.trim();
       const notesField = document.getElementById('notes');
@@ -289,13 +255,13 @@
 
       discordTag.value = `<@${discordId}>`;
       outcomeField.value = mode === 'accept' ? 'Accepted' : 'Denied';
-      staffMemberField.value = `${name} (${role})`;
+      staffMemberField.value = name;
 
       if (mode === 'deny') {
         notesField.value = `Player eligible to re-apply for CIV+ from ${formattedDate}`;
       }
 
-      const message = mode === "accept" ? 
+      const message = mode === "accept" ?
 `Kia Ora, <@${discordId}>
 
 You have been accepted as a CIV+,
@@ -316,36 +282,45 @@ While you hold this role, you are held to a higher standard for Civilian RP. Sta
 Any questions please let me know.
 
 Cheers,  
-${name}  
-${role}` 
-:
+${name}` :
 `Kia Ora, <@${discordId}>
 
-Thank you for applying for civ+ but unfortunately we do not believe you are fit for CIV+ at this stage. 
+Thank you for applying for CIV+ but unfortunately we do not believe you are fit for the CIV+ role at this stage. 
 Please do not be disheartened and continue to show staff what you are capable of. 
 
 You are eligible to re-apply for CIV+ from ${formattedDate}
 
 Kind Regards,  
-${name}  
-${role}`;
+${name}`;
 
       document.getElementById('output').value = message;
+      document.getElementById('copiedIcon').classList.remove('show');
+    }
 
+    function generateLogEntry() {
+      const discordId = document.getElementById('discordId').value.trim();
+      const name = nameSelect.value;
+      const ingameName = document.getElementById('ingameName').value.trim();
+      const ticketId = document.getElementById('ticketId').value.trim();
+      const notesField = document.getElementById('notes');
+      const loggedTx = document.getElementById('loggedTx').value;
       const dateValue = appDate.value ? formatDateOrdinal(appDate.value) : 'Not set';
+
+      if (!ingameName || !ticketId) {
+        alert("Please enter both Ingame Name and Ticket ID before generating the log.");
+        return;
+      }
 
       const appLog = `Ingame Name: ${ingameName}
 Discord: <@${discordId}>
 Date of Application: ${dateValue}
 TicketID: ${ticketId}
 Outcome: ${mode === 'accept' ? 'Accepted' : 'Denied'}
-Staff Member: ${name} (${role})
+Staff Member: ${name}
 Notes: ${notesField.value}
 Logged in TX if successful: ${mode === 'deny' ? 'N/A' : (loggedTx || '...')}`;
 
       logOutput.value = appLog;
-
-      document.getElementById('copiedIcon').classList.remove('show');
       document.getElementById('copiedIconLog').classList.remove('show');
     }
 
