@@ -51,6 +51,10 @@
     input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
     }
+    input[readonly] {
+      background-color: #333;
+      cursor: not-allowed;
+    }
     button {
       background-color: #555;
       cursor: pointer;
@@ -143,6 +147,9 @@
       <label for="nameSelect">Staff Member:</label>
       <select id="nameSelect"></select>
 
+      <label for="staffRole">Staff Role:</label>
+      <input type="text" id="staffRole" readonly />
+
       <button onclick="generate()">Generate Message</button>
 
       <div class="textarea-container">
@@ -193,6 +200,7 @@
   <script>
     let mode = "accept";
     const nameSelect = document.getElementById('nameSelect');
+    const staffRole = document.getElementById('staffRole');
     const discordTag = document.getElementById('discordTag');
     const appDate = document.getElementById('appDate');
     const outcomeField = document.getElementById('outcome');
@@ -211,7 +219,10 @@
 
         nameSelect.addEventListener('change', () => {
           const selected = data.find(staff => staff.name === nameSelect.value);
-          if (selected) staffMemberField.value = selected.name;
+          if (selected) {
+            staffRole.value = selected.role;
+            staffMemberField.value = selected.name;
+          }
         });
       });
 
@@ -243,10 +254,8 @@
     function generate() {
       const discordId = document.getElementById('discordId').value.trim();
       const name = nameSelect.value;
-      const ingameName = document.getElementById('ingameName').value.trim();
-      const ticketId = document.getElementById('ticketId').value.trim();
+      const role = staffRole.value;
       const notesField = document.getElementById('notes');
-      const loggedTx = document.getElementById('loggedTx').value;
 
       const today = new Date();
       let futureDate = new Date(today);
@@ -282,7 +291,8 @@ While you hold this role, you are held to a higher standard for Civilian RP. Sta
 Any questions please let me know.
 
 Cheers,  
-${name}` :
+${name}  
+${role}` :
 `Kia Ora, <@${discordId}>
 
 Thank you for applying for CIV+ but unfortunately we do not believe you are fit for the CIV+ role at this stage. 
